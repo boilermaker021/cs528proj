@@ -28,7 +28,7 @@ def handle_dns_query(dns_listener: socket.socket):
             #hostname, _, _ = socket.gethostbyaddr(ip_addr)
             #
             try:
-                result = dns.resolver.resolve(dns.reversename.from_address(ip_addr), 'PTR')
+                result = dns.resolver.resolve(dns.reversename.from_address(str(ip_addr)), 'PTR')
                 hostname = result[0].to_text()
                 print(f'hostname: {hostname}')
                 try:
