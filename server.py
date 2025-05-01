@@ -29,7 +29,7 @@ def main():
     control_sock.bind(('localhost', 55555))
     control_sock.listen(5)
     print("Bound sockets")
-    dns_thread = threading.Thread(target=handle_dns_query, args=(dns_listener))
+    dns_thread = threading.Thread(target=handle_dns_query, args=(dns_listener,))
     dns_thread.start()
     while True:
         client_sock, client_addr = control_sock.accept()
