@@ -24,6 +24,7 @@ def handle_dns_query(dns_listener: socket.socket):
             dest_sock = waiting_for_query[qname]
             del waiting_for_query[qname]
             ip_addr, port = src
+            print(f"ip: {ip_addr}")
             try:
                 w = whois.whois(str(ip_addr))
                 print(f"whoisinfo: {w}")
