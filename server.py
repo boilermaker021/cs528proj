@@ -6,7 +6,7 @@ import string
 import dns.reversename
 from dnslib import DNSRecord
 import dns.resolver
-import whois
+from ipwhois import IPWhois
 
 waiting_for_query = {}
 domain = "cs528proj.com"
@@ -24,13 +24,9 @@ def handle_dns_query(dns_listener: socket.socket):
             dest_sock = waiting_for_query[qname]
             del waiting_for_query[qname]
             ip_addr, port = src
-            print(f"ip: {ip_addr}")
-            try:
-                w = whois.whois(str(ip_addr))
-                print(f"whoisinfo: {w}")
-            except Exception as e:
-                pass
-            
+            lookup = IPWhois(str(ip_addr))
+            res = lookup.lookup_rdap()
+            print(f"ipwhois: {res}")
             
 
 
@@ -52,7 +48,7 @@ def main():
         query_name = f'{rand_prefix}.{domain}'.lower()
         while (query_name in waiting_for_query):
             query_name = f'{rand_prefix}.{domain}'.lower() #ensure unique query ID
-        waiting_for_query[query_name] = client_sock
+        waiting_for_query[query_name] = (client_sock, client_addr)
         client_sock.sendall(query_name.encode())
         
 
