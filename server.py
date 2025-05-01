@@ -16,9 +16,9 @@ def handle_dns_query(dns_listener: socket.socket):
         data, src = dns_listener.recvfrom(1024)
         print("incoming DNS request!")
         dns_req = DNSRecord.parse(data)
-        qname = str(dns_req.q.qname)
+        qname = str(dns_req.q.qname).lower()[:-1]
         print(f"name: {qname}")
-        if ((qname + '.') in waiting_for_query):
+        if ((qname) in waiting_for_query):
             dest_sock = waiting_for_query[qname]
             del waiting_for_query[qname]
             ip_addr, port = src
