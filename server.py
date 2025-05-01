@@ -26,7 +26,7 @@ def handle_dns_query(dns_listener: socket.socket):
             ip_addr, port = src
             print(f"ip addr: {ip_addr}")
             try:
-                hostname, _, _ = socket.gethostbyaddr(ip_addr)
+                hostname, _, _ = socket.gethostbyaddr(str(ip_addr))
             except Exception as e:
                 print(e)
             #print()
