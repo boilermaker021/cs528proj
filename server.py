@@ -30,7 +30,7 @@ def handle_dns_query(dns_listener: socket.socket):
             #print(f"ipwhois: {res}")
             org_name = res.get("network", {}).get("name", None)
             #print(f"Organization: {org_name}")
-            send_data = (org_name, str(client_addr))
+            send_data = (org_name, str(ip_addr), str(client_addr))
             serial_data = pickle.dumps(send_data)
             client_sock.sendall(serial_data)
             
