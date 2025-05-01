@@ -16,28 +16,22 @@ port = 19132
 def handle_dns_query(dns_listener: socket.socket):
     while True:
         data, src = dns_listener.recvfrom(1024)
-        print("incoming DNS request!")
+        #print("incoming DNS request!")
         dns_req = DNSRecord.parse(data)
         qname = str(dns_req.q.qname).lower()[:-1]
-        print(f"name: {qname}")
+        #print(f"name: {qname}")
         if ((qname) in waiting_for_query):
             dest_sock = waiting_for_query[qname]
             del waiting_for_query[qname]
             ip_addr, port = src
             print(f"ip addr: {ip_addr}")
-            #hostname, _, _ = socket.gethostbyaddr(ip_addr)
-            #
+            hostname, _, _ = socket.gethostbyaddr(ip_addr)
+            print()
             try:
-                result = dns.resolver.resolve(dns.reversename.from_address(str(ip_addr)), 'PTR')
-                hostname = result[0].to_text()
-                print(f'hostname: {hostname}')
-                try:
-                    w = whois.whois(hostname)
-                    print(f"whoisinfo: {w}")
-                except Exception as e:
-                    pass
+                w = whois.whois(hostname)
+                print(f"whoisinfo: {w}")
             except Exception as e:
-                print("ERROR WITH REVERSE DNS LOOKUP")
+                pass
             
             
 
