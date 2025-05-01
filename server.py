@@ -3,7 +3,9 @@ import threading
 import time
 import random
 import string
+import dns.reversename
 from dnslib import DNSRecord
+import dns.resolver
 import whois
 
 waiting_for_query = {}
@@ -23,13 +25,20 @@ def handle_dns_query(dns_listener: socket.socket):
             del waiting_for_query[qname]
             ip_addr, port = src
             print(f"ip addr: {ip_addr}")
-            hostname, _, _ = socket.gethostbyaddr(ip_addr)
-            print(f'hostname: {hostname}')
+            #hostname, _, _ = socket.gethostbyaddr(ip_addr)
+            #
             try:
-                w = whois.whois(hostname)
-                print(f"whoisinfo: {w}")
+                result = dns.resolver.resolve(dns.reversename.from_address(ip_addr), 'PTR')
+                hostname = result[0].to_text()
+                print(f'hostname: {hostname}')
+                try:
+                    w = whois.whois(hostname)
+                    print(f"whoisinfo: {w}")
+                except Exception as e:
+                    pass
             except Exception as e:
-                pass
+                print("ERROR WITH REVERSE DNS LOOKUP")
+            
             
 
 
