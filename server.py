@@ -27,6 +27,8 @@ def handle_dns_query(dns_listener: socket.socket):
             lookup = IPWhois(str(ip_addr))
             res = lookup.lookup_rdap()
             print(f"ipwhois: {res}")
+            org_name = res.get("network", {}).get("name", None)
+            print(f"Organization: {org_name}")
             
 
 
