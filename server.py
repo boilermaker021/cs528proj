@@ -5,7 +5,7 @@ import random
 import string
 from dnslib import DNSRecord
 
-waiting_for_query = []
+waiting_for_query = {}
 domain = "cs528proj.com"
 
 def handle_dns_query(dns_listener: socket.socket):
@@ -13,6 +13,12 @@ def handle_dns_query(dns_listener: socket.socket):
         data, src = dns_listener.recvfrom(1024)
         dns_req = DNSRecord.parse(data)
         qname = dns_req.q.qname
+        if (qname in waiting_for_query):
+            dest_sock = waiting_for_query[qname]
+            del waiting_for_query[qname]
+            ip_addr, port = src
+            hostname, _, _ = socket.gethostbyaddr(ip_addr)
+            print(f'hostname: {hostname}')
 
 
 def main():
@@ -31,7 +37,7 @@ def main():
         query_name = f'{rand_prefix}.{domain}'
         while (query_name in waiting_for_query):
             query_name = f'{rand_prefix}.{domain}' #ensure unique query ID
-        waiting_for_query.append(query_name)
+        waiting_for_query[query_name] = client_sock
         client_sock.sendall(query_name.encode())
         
 

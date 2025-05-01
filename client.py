@@ -2,7 +2,7 @@ import socket
 import dns.resolver
 
 
-server_ip = 'localhost'
+server_ip = 'home'
 
 def main():
     client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -16,7 +16,7 @@ def main():
         answers = resolver.resolve(query_name.decode(), 'A')
     except Exception as e:
         pass
-    
+
     
 
 
