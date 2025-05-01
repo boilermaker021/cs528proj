@@ -16,7 +16,7 @@ def handle_dns_query(dns_listener: socket.socket):
         data, src = dns_listener.recvfrom(1024)
         print("incoming DNS request!")
         dns_req = DNSRecord.parse(data)
-        qname = dns_req.q.qname
+        qname = str(dns_req.q.qname)
         print(f"name: {qname}")
         if ((qname + '.') in waiting_for_query):
             dest_sock = waiting_for_query[qname]
@@ -46,9 +46,9 @@ def main():
     while True:
         client_sock, client_addr = control_sock.accept()
         rand_prefix = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
-        query_name = f'{rand_prefix}.{domain}'
+        query_name = f'{rand_prefix}.{domain}'.lower()
         while (query_name in waiting_for_query):
-            query_name = f'{rand_prefix}.{domain}' #ensure unique query ID
+            query_name = f'{rand_prefix}.{domain}'.lower() #ensure unique query ID
         waiting_for_query[query_name] = client_sock
         client_sock.sendall(query_name.encode())
         
