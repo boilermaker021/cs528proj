@@ -8,6 +8,8 @@ from dnslib import DNSRecord
 waiting_for_query = {}
 domain = "cs528proj.com"
 
+port = 19132
+
 def handle_dns_query(dns_listener: socket.socket):
     while True:
         data, src = dns_listener.recvfrom(1024)
@@ -26,7 +28,7 @@ def main():
     control_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     dns_listener.bind(('localhost', 53))
-    control_sock.bind(('localhost', 55555))
+    control_sock.bind(('localhost', port))
     control_sock.listen(5)
     print("Bound sockets")
     dns_thread = threading.Thread(target=handle_dns_query, args=(dns_listener,))
