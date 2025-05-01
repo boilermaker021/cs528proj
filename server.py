@@ -7,6 +7,7 @@ import dns.reversename
 from dnslib import DNSRecord
 import dns.resolver
 from ipwhois import IPWhois
+import pickle
 
 waiting_for_query = {}
 domain = "cs528proj.com"
@@ -21,14 +22,18 @@ def handle_dns_query(dns_listener: socket.socket):
         qname = str(dns_req.q.qname).lower()[:-1]
         #print(f"name: {qname}")
         if ((qname) in waiting_for_query):
-            dest_sock = waiting_for_query[qname]
+            client_sock, client_addr = waiting_for_query[qname]
             del waiting_for_query[qname]
             ip_addr, port = src
             lookup = IPWhois(str(ip_addr))
             res = lookup.lookup_rdap()
-            print(f"ipwhois: {res}")
+            #print(f"ipwhois: {res}")
             org_name = res.get("network", {}).get("name", None)
-            print(f"Organization: {org_name}")
+            #print(f"Organization: {org_name}")
+            send_data = (org_name, str(client_addr))
+            serial_data = pickle.dumps(send_data)
+            client_sock.sendall(serial_data)
+            
             
 
 

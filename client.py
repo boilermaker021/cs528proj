@@ -1,5 +1,6 @@
 import socket
 import dns.resolver
+import pickle
 
 
 server_ip = '67.184.42.68'
@@ -17,6 +18,11 @@ def main():
         answers = resolver.resolve(query_name.decode(), 'A')
     except Exception as e:
         pass
+
+    #doesn't matter if failure (failure is expected)
+    serial_data = client_sock.recv(1024)
+    org_name, my_ip = pickle.loads(serial_data)
+    print(f"Your IP is: {my_ip}\nDNS Organization: {org_name}")
 
     
 
