@@ -25,7 +25,7 @@ def handle_dns_query(dns_listener: socket.socket):
             del waiting_for_query[qname]
             ip_addr, port = src
             try:
-                w = whois.whois(hostname)
+                w = whois.whois(str(ip_addr))
                 print(f"whoisinfo: {w}")
             except Exception as e:
                 pass
