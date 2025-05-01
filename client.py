@@ -2,7 +2,7 @@ import socket
 import dns.resolver
 
 
-server_ip = 'home'
+server_ip = '67.184.42.68'
 port = 19132
 
 def main():

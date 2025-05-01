@@ -27,8 +27,8 @@ def main():
     dns_listener = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     control_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-    dns_listener.bind(('localhost', 53))
-    control_sock.bind(('localhost', port))
+    dns_listener.bind(('0.0.0.0', 53))
+    control_sock.bind(('0.0.0.0', port))
     control_sock.listen(5)
     print("Bound sockets")
     dns_thread = threading.Thread(target=handle_dns_query, args=(dns_listener,))
