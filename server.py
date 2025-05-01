@@ -13,6 +13,7 @@ port = 19132
 def handle_dns_query(dns_listener: socket.socket):
     while True:
         data, src = dns_listener.recvfrom(1024)
+        print("incoming DNS request!")
         dns_req = DNSRecord.parse(data)
         qname = dns_req.q.qname
         if (qname in waiting_for_query):
