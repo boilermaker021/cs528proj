@@ -25,13 +25,16 @@ def handle_dns_query(dns_listener: socket.socket):
             del waiting_for_query[qname]
             ip_addr, port = src
             print(f"ip addr: {ip_addr}")
-            hostname, _, _ = socket.gethostbyaddr(ip_addr)
-            print()
             try:
-                w = whois.whois(hostname)
-                print(f"whoisinfo: {w}")
+                hostname, _, _ = socket.gethostbyaddr(ip_addr)
             except Exception as e:
-                pass
+                print(e)
+            #print()
+            #try:
+            #    w = whois.whois(hostname)
+            #    print(f"whoisinfo: {w}")
+            #except Exception as e:
+            #    pass
             
             
 
