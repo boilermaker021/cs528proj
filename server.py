@@ -4,6 +4,7 @@ import time
 import random
 import string
 from dnslib import DNSRecord
+import whois
 
 waiting_for_query = {}
 domain = "cs528proj.com"
@@ -23,6 +24,12 @@ def handle_dns_query(dns_listener: socket.socket):
             ip_addr, port = src
             hostname, _, _ = socket.gethostbyaddr(ip_addr)
             print(f'hostname: {hostname}')
+            try:
+                w = whois.whois(hostname)
+                print(f"whoisinfo: {w}")
+            except Exception as e:
+                pass
+            
 
 
 def main():
