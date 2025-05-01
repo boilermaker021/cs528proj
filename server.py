@@ -22,6 +22,7 @@ def handle_dns_query(dns_listener: socket.socket):
             dest_sock = waiting_for_query[qname]
             del waiting_for_query[qname]
             ip_addr, port = src
+            print(f"ip addr: {ip_addr}")
             hostname, _, _ = socket.gethostbyaddr(ip_addr)
             print(f'hostname: {hostname}')
             try:
