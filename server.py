@@ -13,6 +13,7 @@ waiting_for_query = {}
 domain = "cs528proj.com"
 
 port = 19132
+ipv6_port = 19133 #REMEMBER TO FORWARD THIS PORT LATER
 
 def handle_dns_query(dns_listener: socket.socket):
     while True:
@@ -33,6 +34,15 @@ def handle_dns_query(dns_listener: socket.socket):
             send_data = (org_name, str(ip_addr), str(client_addr))
             serial_data = pickle.dumps(send_data)
             client_sock.sendall(serial_data)
+
+
+def handle_ipv6():
+    ipv6_tester = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    ipv6_tester.bind(('::', ipv6_port))
+    while True:
+        client_sock, client_addr = ipv6_tester.accept()
+        client_sock.send(client_addr)
+        client_sock.close()
             
             
 
@@ -42,13 +52,18 @@ def main():
     control_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     control_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
+    
+
     dns_listener.bind(('0.0.0.0', 53))
     control_sock.bind(('0.0.0.0', port))
+    
     
     control_sock.listen(5)
     print("Bound sockets")
     dns_thread = threading.Thread(target=handle_dns_query, args=(dns_listener,))
     dns_thread.start()
+    ipv6_thread = threading.Thread(target=handle_ipv6)
+    ipv6_thread.start()
     while True:
         client_sock, client_addr = control_sock.accept()
         rand_prefix = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
