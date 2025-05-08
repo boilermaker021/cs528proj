@@ -39,6 +39,7 @@ def handle_dns_query(dns_listener: socket.socket):
 def handle_ipv6():
     ipv6_tester = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
     ipv6_tester.bind(('::', ipv6_port))
+    ipv6_tester.listen(5)
     while True:
         client_sock, client_addr = ipv6_tester.accept()
         client_sock.send(client_addr)
