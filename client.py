@@ -6,6 +6,7 @@ import subprocess
 import os
 import sys
 import termios
+import webbrowser
 
 #Ips of my home network (where the server is running)
 server_ip = '67.184.42.68'
@@ -22,13 +23,15 @@ def do_dns_check():
     client_sock.connect((server_ip, port))
     query_name = client_sock.recv(1024)
     #print(f'We need to query {query_name.decode()}')
-    resolver = dns.resolver.Resolver()
-    resolver.timeout = 1
-    resolver.lifetime = 1
-    try:
-        answers = resolver.resolve(query_name.decode(), 'A')
-    except Exception as e:
-        pass
+    #resolver = dns.resolver.Resolver()
+    #resolver.timeout = 1
+    #resolver.lifetime = 1
+    #try:
+        #answers = resolver.resolve(query_name.decode(), 'A')
+    #except Exception as e:
+        #pass
+    
+    webbrowser.open(query_name)
 
     #doesn't matter if failure (failure is expected)
     serial_data = client_sock.recv(1024)
