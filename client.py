@@ -42,7 +42,7 @@ def do_dns_check():
 
 def do_ipv6_check():
     client_sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-    client_sock.connect((server_ip6, ipv6_port))
+    client_sock.connect((server_ip6, ipv6_port, 0, 0))
     ipv6 = client_sock.recv(1024)
     client_sock.close()
     return ipv6
