@@ -31,7 +31,7 @@ def do_dns_check():
     #except Exception as e:
         #pass
     
-    webbrowser.open(query_name)
+    webbrowser.open(str(query_name.decode())) #this ensures DNS query behavior consistent with web broswing
 
     #doesn't matter if failure (failure is expected)
     serial_data = client_sock.recv(1024)
@@ -43,7 +43,7 @@ def do_dns_check():
 def do_ipv6_check():
     client_sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
     client_sock.connect((server_ip6, ipv6_port))
-    ipv6 = client_sock.recvfrom(1024)
+    ipv6 = client_sock.recv(1024)
     client_sock.close()
     return ipv6
 
@@ -54,19 +54,28 @@ def main():
         #do one check without VPN activation
         print("Testing with current system configuration...")
         org_name1, dns_ip1, my_ip1 = do_dns_check()
-        ipv6_1 = do_ipv6_check()
         print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
-        print(f"Your IPv6 is: {ipv6_1}")
+        try:
+            ipv6_1 = do_ipv6_check()
+            print(f"Your IPv6 is: {ipv6_1}")
+        except Exception as e:
+            print("Could not route to ipv6")
         
     else:
         #do 2 checks with VPN activation
+        ipv6_1 = None
+        ipv6_2 = None
         config_path = sys.argv[1]
         vpn_command = ['sudo', 'openvpn', config_path]
         print("Testing without VPN...")
         org_name1, dns_ip1, my_ip1 = do_dns_check()
-        ipv6_1 = do_ipv6_check()
         print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
-        print(f"Your IPv6 is: {ipv6_1}")
+        try:
+            ipv6_1 = do_ipv6_check()
+            print(f"Your IPv6 is: {ipv6_1}")
+        except Exception as e:
+            print("Could not route to ipv6")
+        
         print("Activating VPN...\n")
 
         fd = sys.stdin.fileno()
@@ -79,9 +88,13 @@ def main():
 
         print("Testing with VPN...")
         org_name2, dns_ip2, my_ip2 = do_dns_check()
-        ipv6_2 = do_ipv6_check()
+        #ipv6_2 = do_ipv6_check()
         print(f"Your IP is: {my_ip2}\nDNS IP: {dns_ip2}\nDNS Organization: {org_name2}")
-        print(f"Your IPv6 is: {ipv6_2}")
+        try:
+            ipv6_2 = do_ipv6_check()
+            print(f"Your IPv6 is: {ipv6_2}")
+        except Exception as e:
+            print("Could not route to ipv6")
 
         process.terminate()
         process.wait()
@@ -91,7 +104,7 @@ def main():
         else:
             print("Different organizations handle your DNS requests with and without the VPN\nYou are likely safe from DNS leak!")
 
-        if (ipv6_1 == ipv6_2):
+        if (ipv6_1 == ipv6_2 and ipv6_1 != None):
             print("Your ipv6 remains the same with and without the VPN\nYou have an ipv6 leak. All ipv6 traffic will be routed through your ISP as if the VPN was absent.")
 
     
