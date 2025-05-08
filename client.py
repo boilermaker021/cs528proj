@@ -57,16 +57,18 @@ def main():
     if (arg_len == 0):
         #do one check without VPN activation
         print("Testing with current system configuration...")
-        org_name1, dns_ip1, my_ip1 = do_dns_check()
-        print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
-        try:
-            ipv6_1 = do_ipv6_check()
-            if ipv6_1 == None:
-                print("Unable to establish ipv6 connection")
-            else:
-                print(f"Your IPv6 is: {ipv6_1}")
-        except Exception as e:
-            print("Could not route to ipv6")
+        for i in range(0,10):
+            print(f"Test #{i}")
+            org_name1, dns_ip1, my_ip1 = do_dns_check()
+            print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
+            try:
+                ipv6_1 = do_ipv6_check()
+                if ipv6_1 == None:
+                    print("Unable to establish ipv6 connection")
+                else:
+                    print(f"Your IPv6 is: {ipv6_1}")
+            except Exception as e:
+                print("Could not route to ipv6")
         
     else:
         #do 2 checks with VPN activation

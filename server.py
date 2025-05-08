@@ -4,13 +4,14 @@ import time
 import random
 import string
 import dns.reversename
-from dnslib import DNSRecord
+from dnslib import DNSRecord, RR, QTYPE, A
 import dns.resolver
 from ipwhois import IPWhois
 import pickle
 
 waiting_for_query = {}
 domain = "cs528proj.com"
+own_ip = '67.184.42.68'
 
 port = 19132
 ipv6_port = 19133 #REMEMBER TO FORWARD THIS PORT LATER
@@ -34,6 +35,15 @@ def handle_dns_query(dns_listener: socket.socket):
             send_data = (org_name, str(ip_addr), str(client_addr))
             serial_data = pickle.dumps(send_data)
             client_sock.sendall(serial_data)
+        #now send proper response
+        reply = dns_req.reply()
+        for q in dns_req.questions:
+            qname = q.qname
+            qtype = q.qtype
+            if qtype == QTYPE.A:
+                reply.add_answer(RR(qname, QTYPE.A, rdata=A(own_ip), ttl=60))
+        dns_listener.sendto(reply, src)
+
 
 
 def handle_ipv6():
@@ -43,7 +53,7 @@ def handle_ipv6():
     ipv6_tester.listen(5)
     while True:
         client_sock, client_addr = ipv6_tester.accept()
-        client_sock.send(client_addr)
+        client_sock.send(client_addr) #just send own ipv6 back to client so they can know which one is being used (if same as original, then it means that there is a leak)
         client_sock.close()
             
             
