@@ -31,7 +31,7 @@ def do_dns_check():
     #except Exception as e:
         #pass
     
-    webbrowser.open(str(query_name.decode())) #this ensures DNS query behavior consistent with web broswing
+    webbrowser.open('http://' + str(query_name.decode())) #this ensures DNS query behavior consistent with web broswing
 
     #doesn't matter if failure (failure is expected)
     serial_data = client_sock.recv(1024)
