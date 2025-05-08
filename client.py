@@ -42,7 +42,11 @@ def do_dns_check():
 
 def do_ipv6_check():
     client_sock = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
-    client_sock.connect((server_ip6, ipv6_port, 0, 0))
+    client_sock.settimeout(5)
+    try:
+        client_sock.connect((server_ip6, ipv6_port, 0, 0))
+    except socket.timeout:
+        return None
     ipv6 = client_sock.recv(1024)
     client_sock.close()
     return ipv6
@@ -57,7 +61,10 @@ def main():
         print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
         try:
             ipv6_1 = do_ipv6_check()
-            print(f"Your IPv6 is: {ipv6_1}")
+            if ipv6_1 == None:
+                print("Unable to establish ipv6 connection")
+            else:
+                print(f"Your IPv6 is: {ipv6_1}")
         except Exception as e:
             print("Could not route to ipv6")
         
@@ -72,7 +79,10 @@ def main():
         print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
         try:
             ipv6_1 = do_ipv6_check()
-            print(f"Your IPv6 is: {ipv6_1}")
+            if ipv6_1 == None:
+                print("Unable to establish ipv6 connection")
+            else:
+                print(f"Your IPv6 is: {ipv6_1}")
         except Exception as e:
             print("Could not route to ipv6")
         
@@ -92,7 +102,10 @@ def main():
         print(f"Your IP is: {my_ip2}\nDNS IP: {dns_ip2}\nDNS Organization: {org_name2}")
         try:
             ipv6_2 = do_ipv6_check()
-            print(f"Your IPv6 is: {ipv6_2}")
+            if ipv6_2 == None:
+                print("Unable to establish ipv6 connection")
+            else:
+                print(f"Your IPv6 is: {ipv6_2}")
         except Exception as e:
             print("Could not route to ipv6")
 
