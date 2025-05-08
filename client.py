@@ -46,37 +46,50 @@ def do_ipv6_check():
 
 
 def main():
-    print("Testing without VPN...")
-    org_name1, dns_ip1, my_ip1 = do_dns_check()
-    ipv6_1 = do_ipv6_check()
-    print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
-    print(f"Your IPv6 is: {ipv6_1}")
-    print("Activating VPN...\n")
-
-    fd = sys.stdin.fileno()
-    old_settings = termios.tcgetattr(fd)
-
-
-    process = subprocess.Popen(vpn_command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(10)
-    termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-
-    print("Testing with VPN...")
-    org_name2, dns_ip2, my_ip2 = do_dns_check()
-    ipv6_2 = do_ipv6_check()
-    print(f"Your IP is: {my_ip2}\nDNS IP: {dns_ip2}\nDNS Organization: {org_name2}")
-    print(f"Your IPv6 is: {ipv6_2}")
-
-    process.terminate()
-    process.wait()
-
-    if (org_name1 == org_name2):
-        print("The same organization handles your DNS requests with and without the VPN\nYou likely have a DNS leak!")
+    arg_len = len(sys.argv) - 1
+    if (arg_len == 0):
+        #do one check without VPN activation
+        print("Testing with current system configuration...")
+        org_name1, dns_ip1, my_ip1 = do_dns_check()
+        ipv6_1 = do_ipv6_check()
+        print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
+        print(f"Your IPv6 is: {ipv6_1}")
+        
     else:
-        print("Different organizations handle your DNS requests with and without the VPN\nYou are likely safe from DNS leak!")
+        #do 2 checks with VPN activation
+        config_path = sys.argv[1]
+        vpn_command = ['sudo', 'openvpn', config_path]
+        print("Testing without VPN...")
+        org_name1, dns_ip1, my_ip1 = do_dns_check()
+        ipv6_1 = do_ipv6_check()
+        print(f"Your IP is: {my_ip1}\nDNS IP: {dns_ip1}\nDNS Organization: {org_name1}")
+        print(f"Your IPv6 is: {ipv6_1}")
+        print("Activating VPN...\n")
 
-    if (ipv6_1 == ipv6_2):
-        print("Your ipv6 remains the same with and without the VPN\nYou have an ipv6 leak. All ipv6 traffic will be routed through your ISP as if the VPN was absent.")
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+
+
+        process = subprocess.Popen(vpn_command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(10)
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+        print("Testing with VPN...")
+        org_name2, dns_ip2, my_ip2 = do_dns_check()
+        ipv6_2 = do_ipv6_check()
+        print(f"Your IP is: {my_ip2}\nDNS IP: {dns_ip2}\nDNS Organization: {org_name2}")
+        print(f"Your IPv6 is: {ipv6_2}")
+
+        process.terminate()
+        process.wait()
+
+        if (org_name1 == org_name2):
+            print("The same organization handles your DNS requests with and without the VPN\nYou likely have a DNS leak!")
+        else:
+            print("Different organizations handle your DNS requests with and without the VPN\nYou are likely safe from DNS leak!")
+
+        if (ipv6_1 == ipv6_2):
+            print("Your ipv6 remains the same with and without the VPN\nYou have an ipv6 leak. All ipv6 traffic will be routed through your ISP as if the VPN was absent.")
 
     
 
