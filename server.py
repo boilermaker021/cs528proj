@@ -38,6 +38,7 @@ def handle_dns_query(dns_listener: socket.socket):
 
 def handle_ipv6():
     ipv6_tester = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+    ipv6_tester.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 1)
     ipv6_tester.bind(('::', ipv6_port))
     ipv6_tester.listen(5)
     while True:
