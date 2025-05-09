@@ -150,7 +150,7 @@ def main():
             print("Different organizations handle your DNS requests with and without the VPN\nYou are likely safe from de-anonymizing behavior")
 
         intersect = dns_server_set1 & dns_server_set2
-        if (intersect.size() != 0):
+        if (len(intersect) != 0):
             print("Some DNS servers are present both before and after VPN Activation! You likely have a DNS leak!\n")
 
         if (ipv6_1 == ipv6_2 and ipv6_1 != None):
