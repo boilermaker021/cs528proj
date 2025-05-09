@@ -23,8 +23,9 @@ def handle_dns_query(dns_listener: socket.socket):
         #print("incoming DNS request!")
         dns_req = DNSRecord.parse(data)
         qname = str(dns_req.q.qname).lower()[:-1]
-        #print(f"name: {qname}")
+        print(f"Incoming query for: {qname}")
         if ((qname) in waiting_for_query):
+            print(f'From client: {str(client_addr)}')
             client_sock, client_addr = waiting_for_query[qname]
             del waiting_for_query[qname]
             ip_addr, port = src
@@ -45,6 +46,7 @@ def handle_dns_query(dns_listener: socket.socket):
                 reply.add_answer(RR(qname, QTYPE.A, rdata=A(own_ip), ttl=60))
         #print(f'sending: {str(reply)} to {str(src)}')
         dns_listener.sendto(reply.pack(), src)
+        print(f"Responding to DNS query from resolver: {str(src)}")
 
 
 
