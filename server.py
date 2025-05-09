@@ -25,8 +25,8 @@ def handle_dns_query(dns_listener: socket.socket):
         qname = str(dns_req.q.qname).lower()[:-1]
         print(f"Incoming query for: {qname}")
         if ((qname) in waiting_for_query):
-            print(f'From client: {str(client_addr)}')
             client_sock, client_addr = waiting_for_query[qname]
+            print(f'From client: {str(client_addr)}')
             del waiting_for_query[qname]
             ip_addr, port = src
             lookup = IPWhois(str(ip_addr))
