@@ -43,7 +43,7 @@ def handle_dns_query(dns_listener: socket.socket):
             qtype = q.qtype
             if qtype == QTYPE.A:
                 reply.add_answer(RR(qname, QTYPE.A, rdata=A(own_ip), ttl=60))
-        print(f'sending: {str(reply)} to {str(src)}')
+        #print(f'sending: {str(reply)} to {str(src)}')
         dns_listener.sendto(reply.pack(), src)
 
 
@@ -102,6 +102,9 @@ def main():
     dns_thread.start()
     ipv6_thread = threading.Thread(target=handle_ipv6)
     ipv6_thread.start()
+
+    http_thread = threading.Thread(target=http_thread)
+    http_thread.start()
     while True:
         client_sock, client_addr = control_sock.accept()
         rand_prefix = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
