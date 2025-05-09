@@ -6,6 +6,7 @@ import string
 import dns.reversename
 from dnslib import DNSRecord, RR, QTYPE, A
 import dns.resolver
+from ipwhois import IPWhois
 import pickle
 
 waiting_for_query = {}
