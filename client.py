@@ -55,9 +55,24 @@ def do_ipv6_check():
 
 def main():
     arg_len = len(sys.argv) - 1
-    if (arg_len == 0):
+    if arg_len == 0:
+        print("Invalid usage! check readme")
+        return
+    default_if = sys.argv[1]
+    #reuse http port for out-of-VPN traffic checking
+    out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    out.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, default_if.encode())
+
+    try:
+        out.connect((server_ip, http_port))
+        out.close()
+        print('Out-of-VPN connetion established! Consider using a VPN that blocks traffic on other interfaces, or configure iptables rules to do this.')
+    except Exception as e:
+        print('Could not establish out-of-VPN connection! Your VPN setup blocks non-VPN traffic, preserving privacy!')
+    if (arg_len == 1):
+        defalt_if = sys.argv[1]
         #do one check without VPN activation
-        dns_server_set = {}
+        dns_server_set = set()
         print("Testing with current system configuration...")
         for i in range(0,10):
             print(f"Test #{i}")
@@ -73,14 +88,14 @@ def main():
         except Exception as e:
             print("Could not route to ipv6")
         
-    else:
+    elif arg_len >= 2:
         #do 2 checks with VPN activation
         ipv6_1 = None
         ipv6_2 = None
-        config_path = sys.argv[1]
+        config_path = sys.argv[2]
         vpn_command = ['sudo', 'openvpn', config_path]
         print("Testing without VPN...")
-        dns_server_set1 = {}
+        dns_server_set1 = set()
         for i in range(0,10):
             org_name1, dns_ip1, my_ip1 = do_dns_check()
             dns_server_set1.add((org_name1, dns_ip1))
@@ -105,7 +120,7 @@ def main():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings) #this resets terminal graphical settings so the openVPN output doesn't ruin further output
 
         print("Testing with VPN...")
-        dns_server_set2 = {}
+        dns_server_set2 = set()
         for i in range(0,10):
             org_name2, dns_ip2, my_ip2 = do_dns_check()
             dns_server_set2.add((org_name2, dns_ip2))
@@ -123,9 +138,13 @@ def main():
         process.wait()
 
         if (org_name1 == org_name2):
-            print("The same organization handles your DNS requests with and without the VPN\nYou likely have a DNS leak!")
+            print("The same organization handles your DNS requests with and without the VPN\nYou may be vulnerable to de-anonymization if your DNS provider is your ISP!")
         else:
-            print("Different organizations handle your DNS requests with and without the VPN\nYou are likely safe from DNS leak!")
+            print("Different organizations handle your DNS requests with and without the VPN\nYou are likely safe from de-anonymizing behavior")
+
+        intersect = dns_server_set1 & dns_server_set2
+        if (intersect.size() != 0):
+            print("Some DNS servers are present both before and after VPN Activation! You likely have a DNS leak!\n")
 
         if (ipv6_1 == ipv6_2 and ipv6_1 != None):
             print("Your ipv6 remains the same with and without the VPN\nYou have an ipv6 leak. All ipv6 traffic will be routed through your ISP as if the VPN was absent.")
