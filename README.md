@@ -3,7 +3,7 @@ Ensure python3 and the required dependencies are installed. If you have openVPN 
 
 
 # Required Packages
-`dnspython dnslib`
+`dnspython dnslib ipwhois`
 
 
 # Usage With Own Server
