@@ -103,7 +103,7 @@ def main():
     ipv6_thread = threading.Thread(target=handle_ipv6)
     ipv6_thread.start()
 
-    http_thread = threading.Thread(target=http_thread)
+    http_thread = threading.Thread(target=serve_http)
     http_thread.start()
     while True:
         client_sock, client_addr = control_sock.accept()
