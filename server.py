@@ -15,6 +15,7 @@ own_ip = '67.184.42.68'
 
 port = 19132
 ipv6_port = 19133 #REMEMBER TO FORWARD THIS PORT LATER
+http_port = 19134
 
 def handle_dns_query(dns_listener: socket.socket):
     while True:
@@ -55,6 +56,30 @@ def handle_ipv6():
         client_sock, client_addr = ipv6_tester.accept()
         client_sock.send(client_addr) #just send own ipv6 back to client so they can know which one is being used (if same as original, then it means that there is a leak)
         client_sock.close()
+
+
+def serve_http():
+    http_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    http_sock.bind(('0.0.0.0', http_port))
+    http_sock.listen(5)
+    file = open('close.html', 'r')
+    content = file.read()
+
+    http_response = (
+        'HTTP/1.1 200 OK\r\n'
+        'Content-Type: text/html; charset=utf-8\r\n'
+        f'Content-Length: {len(content)}\r\n'
+        'Connection: close\r\n'
+        '\r\n' +
+        content
+    ).encode('utf-8')
+
+    while True:
+        client_sock, addr = http_sock.accept()
+        client_sock.recv(1024)
+        client_sock.sendall(http_response)
+        client_sock.close()
+
             
             
 
@@ -81,7 +106,7 @@ def main():
         rand_prefix = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
         query_name = f'{rand_prefix}.{domain}'.lower()
         while (query_name in waiting_for_query):
-            query_name = f'{rand_prefix}.{domain}'.lower() #ensure unique query ID
+            query_name = f'{rand_prefix}.{domain}'.lower() #ensure unique query ID (subdomain)
         waiting_for_query[query_name] = (client_sock, client_addr)
         client_sock.sendall(query_name.encode())
         
