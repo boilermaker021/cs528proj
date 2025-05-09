@@ -43,6 +43,7 @@ def handle_dns_query(dns_listener: socket.socket):
             qtype = q.qtype
             if qtype == QTYPE.A:
                 reply.add_answer(RR(qname, QTYPE.A, rdata=A(own_ip), ttl=60))
+        print(f'sending: {reply} to {src}')
         dns_listener.sendto(reply, src)
 
 
