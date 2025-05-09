@@ -63,14 +63,14 @@ def main():
     out = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     out.setsockopt(socket.SOL_SOCKET, socket.SO_BINDTODEVICE, default_if.encode())
 
-    try:
-        out.connect((server_ip, http_port))
-        out.close()
-        print('Out-of-VPN connetion established! Consider using a VPN that blocks traffic on other interfaces, or configure iptables rules to do this.')
-    except Exception as e:
-        print('Could not establish out-of-VPN connection! Your VPN setup blocks non-VPN traffic, preserving privacy!')
+    
     if (arg_len == 1):
-        defalt_if = sys.argv[1]
+        try:
+            out.connect((server_ip, http_port))
+            out.close()
+            print('Out-of-VPN connetion established! Consider using a VPN that blocks traffic on other interfaces, or configure iptables rules to do this.')
+        except Exception as e:
+            print('Could not establish out-of-VPN connection! Your VPN setup blocks non-VPN traffic, preserving privacy!')
         #do one check without VPN activation
         dns_server_set = set()
         print("Testing with current system configuration...")
@@ -120,6 +120,13 @@ def main():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings) #this resets terminal graphical settings so the openVPN output doesn't ruin further output
 
         print("Testing with VPN...")
+
+        try:
+            out.connect((server_ip, http_port))
+            out.close()
+            print('Out-of-VPN connetion established! Consider using a VPN that blocks traffic on other interfaces, or configure iptables rules to do this.')
+        except Exception as e:
+            print('Could not establish out-of-VPN connection! Your VPN setup blocks non-VPN traffic, preserving privacy!')
         dns_server_set2 = set()
         for i in range(0,10):
             org_name2, dns_ip2, my_ip2 = do_dns_check()
@@ -138,7 +145,7 @@ def main():
         process.wait()
 
         if (org_name1 == org_name2):
-            print("The same organization handles your DNS requests with and without the VPN\nYou may be vulnerable to de-anonymization if your DNS provider is your ISP!")
+            print("The same organization handles your DNS requests with and without the VPN\nYou may be vulnerable to de-anonymization, especially if your DNS provider is your ISP!")
         else:
             print("Different organizations handle your DNS requests with and without the VPN\nYou are likely safe from de-anonymizing behavior")
 
